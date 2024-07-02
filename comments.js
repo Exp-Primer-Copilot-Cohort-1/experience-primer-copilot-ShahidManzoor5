@@ -1,31 +1,29 @@
-//create web server
-//read comments.html file
-//send the file content as response
+const express = require('express');
+const bodyParser = require('body-parser');
 
-// Import the http and fs modules
-const http = require('http');
-const fs = require('fs');
+const app = express();
+app.use(bodyParser.json());
 
-// Create the HTTP server
-const server = http.createServer((req, res) => {
-    // Read the comments.html file using the fs module
-    fs.readFile('comments.html', (err, data) => {
-        if (err) {
-            // If there is an error reading the file, respond with a 404 status code and error message
-            res.writeHead(404, {'Content-Type': 'text/plain'});
-            res.end('404 Not Found');
-        } else {
-            // If the file is read successfully, respond with a 200 status code and the file content
-            res.writeHead(200, {'Content-Type': 'text/html'});
-            res.end(data);
-        }
-    });
+let comments = [];
+
+// Route to get all comments
+app.get('/comments', (req, res) => {
+    res.json(comments);
 });
 
-// The server listens on port 3000
-server.listen(3000, () => {
-    console.log('Server is listening on port 3000');
+// Route to post a new comment
+app.post('/comments', (req, res) => {
+    const comment = req.body.comment;
+    if (comment) {
+        comments.push(comment);
+        res.status(201).json({ message: 'Comment added successfully!' });
+    } else {
+        res.status(400).json({ message: 'Comment cannot be empty!' });
+    }
 });
 
-// Print the URL to access the server
-console.log('To access the server, open a web browser and go to http://localhost:3000');
+// Start the server
+const port = 3000;
+app.listen(port, () => {
+    console.log(`Server running at http://localhost:${port}/`);
+});
